@@ -1,0 +1,77 @@
+package com.JWT.demo.Configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig {
+    private final JWTAuthenticationEntryPoint jwtAuthentication;
+    private final JWTRequestFilter jwtRequestFilter;
+    private final UserDetailsService jwtService;
+
+    public WebSecurityConfig(
+            JWTAuthenticationEntryPoint jwtAuthentication,
+            JWTRequestFilter jwtRequestFilter,
+            UserDetailsService jwtService) {
+
+        this.jwtAuthentication = jwtAuthentication;
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.jwtService = jwtService;
+    }
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        return new DaoAuthenticationProvider(jwtService);
+    }
+
+    // 🔐 Security Filter Chain (Replaces WebSecurityConfigurerAdapter)
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .cors(cors -> {})
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthentication))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/authenticate", "/registerNewUser").permitAll()
+                        .requestMatchers(HttpHeaders.ALLOW).permitAll()
+                        .anyRequest().authenticated()
+                );
+
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    // 🔐 Authentication Manager Bean
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    // 🔐 Password Encoder
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+
+
+
+
+
