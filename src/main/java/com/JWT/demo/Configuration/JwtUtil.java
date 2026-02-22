@@ -10,18 +10,16 @@ import java.util.Date;
 
 public class JwtUtil {
 
-    private static String secretKey = "ZmFrZXNlY3JldGtleTEyMzQ1"; // Base64 encoded
+    private static final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Base64 encoded
 
     // Generate JWT token
     public static String generateToken(String username) {
-
-        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 
         return Jwts.builder()
                 .setSubject(username)             // "sub" claim
                 .setIssuedAt(new Date())          // "iat" claim
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour expiry
-                .signWith(key)                    // HMAC SHA256
+                .signWith(secretKey)                    // HMAC SHA256
                 .compact();
     }
 }

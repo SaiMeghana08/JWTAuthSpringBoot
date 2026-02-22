@@ -23,15 +23,15 @@ import java.io.IOException;
 
 @Component
 public class JWTRequestFilter extends OncePerRequestFilter {
-    @Autowired
+
     private UserDetailsService userDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey;
 
-//    public JWTRequestFilter(UserDetailsService userDetailsService) {
-//        this.userDetailsService = userDetailsService;
-//    }
+    public JWTRequestFilter(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

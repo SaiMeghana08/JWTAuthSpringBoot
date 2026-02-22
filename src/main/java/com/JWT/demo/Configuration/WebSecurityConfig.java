@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final JWTAuthenticationEntryPoint jwtAuthentication;
     private final JWTRequestFilter jwtRequestFilter;
-    private final UserDetailsService jwtService;
+    private final UserDetailsService UserJWTService;
 
     public WebSecurityConfig(
             JWTAuthenticationEntryPoint jwtAuthentication,
@@ -29,11 +29,17 @@ public class WebSecurityConfig {
 
         this.jwtAuthentication = jwtAuthentication;
         this.jwtRequestFilter = jwtRequestFilter;
-        this.jwtService = jwtService;
+        this.UserJWTService = jwtService;
     }
+
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        return new DaoAuthenticationProvider(jwtService);
+    public DaoAuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService); // pass the variable
+        provider.setPasswordEncoder(passwordEncoder); // pass the passwordEncoder bean
+        return provider;
     }
 
     // 🔐 Security Filter Chain (Replaces WebSecurityConfigurerAdapter)
@@ -49,7 +55,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/authenticate", "/registerNewUser").permitAll()
-                        .requestMatchers(HttpHeaders.ALLOW).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // allow preflight
                         .anyRequest().authenticated()
                 );
 

@@ -9,5 +9,5 @@ import javax.management.relation.RoleList;
 
 @Repository
 public interface UserRepo extends JpaRepository<RolesList,String> {
-    RolesList findByUsername(String username);
+    RolesList findByUser(String username);
 }

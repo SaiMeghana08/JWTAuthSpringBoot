@@ -1,10 +1,12 @@
 package com.JWT.demo.Service;
 
+import com.JWT.demo.Configuration.WebSecurityConfig;
 import com.JWT.demo.Model.Role;
 import com.JWT.demo.Model.RolesList;
 import com.JWT.demo.Repository.RoleRepo;
 import com.JWT.demo.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -16,6 +18,8 @@ public class UserService {
     UserRepo repo;
     @Autowired
     RoleRepo repo1;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     public void createUsers(){
         Role admin=new Role();
         admin.setRoleName("Admin");
@@ -29,7 +33,7 @@ public class UserService {
 
         RolesList role1=new RolesList();
         role1.setUser("User1");
-        role1.setPassword("123");
+        role1.setPassword(passwordEncoder.encode("123"));
         Set<Role> userRoles=new HashSet<>();
         userRoles.add(admin);
         role1.setRoles(userRoles);
@@ -37,7 +41,7 @@ public class UserService {
 
         RolesList role2=new RolesList();
         role2.setUser("User2");
-        role2.setPassword("123");
+        role2.setPassword(passwordEncoder.encode("mypassword123"));
         Set<Role> userRole=new HashSet<>();
         userRole.add(user);
         role2.setRoles(userRole);
