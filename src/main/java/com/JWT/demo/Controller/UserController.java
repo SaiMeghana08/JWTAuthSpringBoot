@@ -6,6 +6,7 @@ import com.JWT.demo.Service.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,14 +32,18 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    @PreAuthorize("/User")
+    @PreAuthorize("hasAuthority('User')")
     public String getUserAcess(){
         return "User Access";
     }
 
     @GetMapping("/admin")
-    @PreAuthorize("/Admin")
+    @PreAuthorize("hasAuthority('Admin')")
     public String getAdminAcess(){
         return "Admin Access";
+    }
+    @GetMapping("/check")
+    public Object checkAuth() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities();
     }
 }

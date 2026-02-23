@@ -20,6 +20,9 @@ public class AuthController {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/authenticate")
     public String createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
         try {
@@ -38,7 +41,7 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
 
         // 3️⃣ Generate JWT token
-        String jwt = JwtUtil.generateToken(userDetails.getUsername());
+        String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
         // 4️⃣ Return the token to the client
         return jwt;
