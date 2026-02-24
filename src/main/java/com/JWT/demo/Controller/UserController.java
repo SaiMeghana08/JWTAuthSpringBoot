@@ -31,17 +31,21 @@ public class UserController {
         return repo.findAll();
     }
 
+    //@PreAuthorize("hasRole('User')") --> "ROLE_USER"
     @GetMapping("/user")
     @PreAuthorize("hasAuthority('User')")
     public String getUserAcess(){
         return "User Access";
     }
 
+    //@PreAuthorize("hasRole('Admin')") --> "ROLE_ADMIN"
     @GetMapping("/admin")
     @PreAuthorize("hasAuthority('Admin')")
     public String getAdminAcess(){
         return "Admin Access";
     }
+
+    //Authorities
     @GetMapping("/check")
     public Object checkAuth() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities();
